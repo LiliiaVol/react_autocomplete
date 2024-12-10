@@ -1,4 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useRef,
+  useEffect,
+  MutableRefObject,
+} from 'react';
 import './App.scss';
 import { peopleFromServer } from './data/people';
 import classNames from 'classnames';
@@ -14,7 +21,10 @@ export const App: React.FC = () => {
   const [isDropdownActive, setIsDropdownActive] = useState(true);
   const [chosenPerson, setChosenPerson] = useState<Person | null>(null);
 
-  const applyQuery = useCallback(debounce(setAppliedQuery, delay), []);
+  const applyQuery = useCallback(debounce(setAppliedQuery, delay), [
+    setAppliedQuery,
+    delay,
+  ]);
 
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -43,13 +53,29 @@ export const App: React.FC = () => {
   }, [appliedQuery, people]);
 
   // test
+  const timeoutRef = useRef<number | null>(null);
+
   const handleInputBlur = () => {
-    setTimeout(() => setIsDropdownActive(false), 100);
+    timeoutRef.current = window.setTimeout(() => {
+      setIsDropdownActive(false);
+    }, 100);
   };
 
   const handleInputFocus = () => {
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current); // Clear any existing timeout
+    }
+
     setIsDropdownActive(true);
   };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) {
+        clearTimeout(timeoutRef.current); // Cleanup timeout on unmount
+      }
+    };
+  }, []);
 
   return (
     <div className="container">

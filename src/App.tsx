@@ -4,7 +4,6 @@ import React, {
   useState,
   useRef,
   useEffect,
-  MutableRefObject,
 } from 'react';
 import './App.scss';
 import { peopleFromServer } from './data/people';
@@ -12,14 +11,13 @@ import classNames from 'classnames';
 import debounce from 'lodash.debounce';
 import { Person } from './types/Person';
 
-const delay = 300;
-
 export const App: React.FC = () => {
   const people: Person[] = peopleFromServer;
   const [query, setQuery] = useState('');
   const [appliedQuery, setAppliedQuery] = useState('');
   const [isDropdownActive, setIsDropdownActive] = useState(true);
   const [chosenPerson, setChosenPerson] = useState<Person | null>(null);
+  const delay = 300;
 
   const applyQuery = useCallback(debounce(setAppliedQuery, delay), [
     setAppliedQuery,

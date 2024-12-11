@@ -12,7 +12,6 @@ import debounce from 'lodash.debounce';
 import { Person } from './types/Person';
 
 export const App: React.FC = () => {
-  const people: Person[] = peopleFromServer;
   const [query, setQuery] = useState('');
   const [appliedQuery, setAppliedQuery] = useState('');
   const [isDropdownActive, setIsDropdownActive] = useState(true);
@@ -34,7 +33,8 @@ export const App: React.FC = () => {
   };
 
   const handlePersonClick = (slug: string) => {
-    const foundedPerson = people.find(person => person.slug === slug) || null;
+    const foundedPerson =
+      peopleFromServer.find(person => person.slug === slug) || null;
 
     setChosenPerson(foundedPerson);
     setIsDropdownActive(false);
@@ -45,12 +45,11 @@ export const App: React.FC = () => {
   };
 
   const filteredPeople = useMemo(() => {
-    return people.filter(person =>
+    return peopleFromServer.filter(person =>
       person.name.toLowerCase().includes(appliedQuery.toLowerCase()),
     );
-  }, [appliedQuery, people]);
+  }, [appliedQuery]);
 
-  // test
   const timeoutRef = useRef<number | null>(null);
 
   const handleInputBlur = () => {
@@ -60,8 +59,8 @@ export const App: React.FC = () => {
   };
 
   const handleInputFocus = () => {
-    if (timeoutRef.current !== null) {
-      clearTimeout(timeoutRef.current); // Clear any existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
 
     setIsDropdownActive(true);
@@ -70,7 +69,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     return () => {
       if (timeoutRef.current !== null) {
-        clearTimeout(timeoutRef.current); // Cleanup timeout on unmount
+        clearTimeout(timeoutRef.current);
       }
     };
   }, []);
